@@ -312,6 +312,9 @@
 \hyphenation{op-tical net-works semi-conduc-tor}
 
 
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+
 \begin{document}
 %
 % paper title
@@ -320,28 +323,20 @@
 % not capitalized unless they are the first or last word of the title.
 % Linebreaks \\ can be used within to get better formatting as desired.
 % Do not put math or special symbols in the title.
-\title{Bare Demo of IEEEtran.cls\\ for IEEE Conferences}
+\title{Planejamento Regional Adaptativo em Sistemas Self-Adaptive de Larga Escala}
 
 
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Michael Shell}
-\IEEEauthorblockA{School of Electrical and\\Computer Engineering\\
-Georgia Institute of Technology\\
-Atlanta, Georgia 30332--0250\\
-Email: http://www.michaelshell.org/contact.html}
-\and
-\IEEEauthorblockN{Homer Simpson}
-\IEEEauthorblockA{Twentieth Century Fox\\
-Springfield, USA\\
-Email: homer@thesimpsons.com}
-\and
-\IEEEauthorblockN{James Kirk\\ and Montgomery Scott}
-\IEEEauthorblockA{Starfleet Academy\\
-San Francisco, California 96678--2391\\
-Telephone: (800) 555--1212\\
-Fax: (888) 555--1212}}
+\author{
+
+	\IEEEauthorblockN{Eudes S. Andrade e Sandro S. Andrade}
+	\IEEEauthorblockA{GSORT -- Grupo de Pesquisa em Sistemas Distribuídos, Otimização, Redes e Tempo Real\\
+		IFBA -- Instituto Federal de Educação, Ciência e Tecnologia da Bahia\\
+		Av. Araújo Pinho, nº 39 -- Canela -- CEP: 40.110-150 -- Salvador-BA\\
+	Email: \{eudes.andrade, sandro.andrade\}@ifba.edu.br}
+}
 
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -380,7 +375,7 @@ Fax: (888) 555--1212}}
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
 \begin{abstract}
-The abstract goes here.
+Construir sistemas computacionais dotados de alguma capacidade de autogerencimento ou auto-adaptação é uma tarefa complexa. Tendo em vista que os sistemas distribuídos têm se tornado cada vez maiores e mais complexos, as soluções para construção de sistemas autogerenciados centralizados não têm se mostrado efetivas. Apesar de algumas propostas para o projeto de sistemas autogerenciados distribuídos estarem disponíveis na literatura, todas elas apresentam como fator limitante a adoção de topologias estáticas no projeto do sistema a ser adaptado.\\Este trabalho tem como objetivo o projeto, implementação e avaliação de um modelo adaptativo para auto gerenciamento em sistemas \textit{self-adaptive} de larga escala. Através dessa abordagem espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema/ambiente sugerem a adoção de topologias mais centralizadas, até situações onde padrões completamente descentralizados apresentam melhor \textit{trade-off}.
 \end{abstract}
 
 % no keywords
