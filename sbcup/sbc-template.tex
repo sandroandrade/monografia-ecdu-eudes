@@ -52,6 +52,28 @@
 \end{resumo}
 
 
+\section{Introdução}
+
+As diversas demandas envolvidas no desenvolvimento de sistemas computacionais modernos têm modificado a forma como tais aplicações são projetadas, desenvolvidas e avaliadas. Dentre tais demandas, destacam-se: a introdução de computadores multiprocessados, a abundância de paralelismo em soluções altamente distribuídas, a facilidade de integração e a capacidade de autogerenciamento em ambientes incertos \cite{DBLP:journals/ijhpca/Heroux09,DBLP:conf/icse/Northrop13,Gamell:2014:EAO:2683593.2683691}. Muitas dessas novas demandas são consequências do aumento de poder computacional apresentado pelos computadores modernos e pela crescente velocidade e confiabilidade das tecnologias de redes de comunicação.
+
+Apesar de todas as estratégias disponibilizadas pela Engenharia de \textit{Software} para gerenciamento da complexidade gerada por esses novos desafios, acredita-se que a capacidade humana de compreensão e manipulação de artefatos de \textit{software} se mostrará como um fator limitante em um futuro próximo \cite{DBLP:journals/csur/HuebscherM08}. A complexidade dos produtos de \textit{software} irá crescer continuamente até um ponto onde as tecnologias mais efetivas e os profissionais mais bem formados não serão capazes de construir soluções satisfatórias \cite{DBLP:journals/computer/KephartC03}.
+
+Tendo em vista que os maiores desafios expostos decorrem de requisitos não-funcionais -- e que estes têm sido historicamente tratados através de decisões de projeto -- linhas de pesquisa modernas apontam para uma nova abordagem: a transferência de determinadas decisões de projeto para \textit{runtime}. Para tanto, os sistemas computacionais deverão estar dotados de alguma capacidade de autogerencimento ou auto-adaptação \cite{DBLP:journals/csur/HuebscherM08,DBLP:journals/computer/KephartC03,DBLP:journals/taas/SalehieT09}.
+
+De acordo com a DARPA (\textit{Defense Advanced Research Projects Agency}) um sistema \textit{self-adaptive} é aquele que avalia o seu próprio comportamento e o modifica quando a avaliação indica que: i) o seu propósito principal não está sendo efetivamente cumprido; ou ii) uma melhor funcionalidade e/ou desempenho pode ser alcançado \cite{DARPA-selfadaptive}. A auto-adaptação é uma estratégia utilizada para os mais diversos fins, desde a otimização de performance em sistemas que operam sobre ambientes que mudam constantemente até situações mais extremas onde sistemas conseguem se recuperar após a falha de parte dos seus componentes \cite{DBLP:conf/dagstuhl/WeynsSGMMPWAGG10}. Apesar das diversas aplicações, temos como característica comum a todos os projetos que fazem uso de auto-adaptação a necessidade de migrar determinadas decisões -- que anteriormente eram tomadas em tempo de projeto -- para \textit{runtime}. A motivação para a tomada de decisão tardia (em \textit{runtime}) é justificada uma vez que o arquiteto não mais precisará se comprometer de forma prematura com determinadas decisões de projeto. Decisões estas que, frequentemente, quando tomadas de forma prematura, podem não se mostrar interessantes em \textit{runtime}. Não se mostram interessantes sobretudo por conta da imprevisibilidade/dinamismo do ambiente de execução bem como das características funcionais do próprio sistema.
+
+A constatação de que soluções centralizadas -- anteriormente aplicadas com sucesso -- não são mais vistas como efetivas atualmente, trouxe algumas consequências. Assim como nos sistemas não-adaptativos, soluções de adaptação centralizadas passaram a não ser mais efetivas. Não eram mais efetivas por conta da imprevisibilidade imposta pelos ambientes distribuídos cada vez maiores e mais complexo. Não eram mais efetivas sobretudo por conta da crescente necessidade de controle em componentes específicos da solução distribuída para que ótimos globais pudessem ser alcançados. De acordo com [8], os sistemas auto-adaptativos que eram originalmente implementados utilizando uma estrutura de controle centralizada, deram espaço à projetos de controle potencialmente distribuídos.
+
+Muitas arquiteturas para autogerenciamento estão disponíveis atualmente na literatura. Ainda assim, a maioria delas apresenta como restrição o suporte, apenas, a sistemas centralizados. Algumas poucas arquiteturas implementam suporte a ambientes descentralizados e as poucas que o fazem não apresentam bom desempenho em ambientes altamente dinâmicos \cite{DBLP:conf/dagstuhl/WeynsSGMMPWAGG10}. A dificuldade para se alcançar autogerenciamento em ambientes descentralizados decorre do inerente \textit{trade-off} existente em sistemas distribuídos: qualidade da solução versus custo computacional. Ou seja, quanto maior o desempenho do sistema, menor a capacidade dele funcionar de maneira satisfatória em situações adversas (seja do ambiente ou da própria operação do sistema). Pode-se ilustrar esse \textit{trade-off} analisando \textit{clusters} para suporte a \textit{cloud computing}. Em tais situações, quanto maior o \textit{overhead} previsto menor será a capacidade do sistema se recuperar em caso de mudanças no ambiente. Por outro lado, quanto maior a folga observada no sistema maior será o consumo de recursos. O objetivo das arquiteturas para autogerenciamento descentralizado em tais \textit{clusters} é reagir ao \textit{trade-off} que envolve a capacidade de atendimento da \textit{cloud} frente às diversas configurações de ambiente apresentadas ao longo do tempo.
+
+A adoção de uma determinada topologia ao modelar o sistema responsável pela adaptação em detrimento de outra é função dos requisitos do sistema a ser monitorado e do ambiente ao qual este estará exposto. Em [8] seis padrões para modelagem de autogerenciamento descentralizado são propostos. Além dos modelos de comunicação a serem realizados entre os diversos componentes do controle, são apresentados os atributos de qualidade inseridos por cada padrão bem como as restrições impostas por tais decisões. Ainda assim, [8] não considera a possibilidade de adaptação dinâmica das topologias apresentadas. Dessa forma, apesar de os sistemas monitorados serem reconfigurados em \textit{runtime}, os sistemas responsáveis pela adaptação não tem nenhuma capacidade autoadaptativa.
+
+Este trabalho tem como objetivo o projeto e avaliação de um modelo adaptativo para autogerenciamento de \textit{Sistemas Self-Adaptive} (SSA) de larga escala. Esse modelo prevê a reconfiguração dinâmica da topologia e forma de comunicação entre os múltiplos componentes locais do controle. Através dessa abordagem, decisões de projeto acerca da topologia de controle a ser adotada serão levadas para \textit{runtime}. Com isso, espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema monitorado/ambiente sugerem a adoção de topologias mais centralizadas, até situações onde padrões completamente descentralizados apresentam melhor \textit{trade-off}.
+
+O mecanismo de reconfiguração dinâmica da arquitetura de controle proposta foi modelado e avaliado via simulação de eventos discretos. Resultados mostram houve uma economia estatisticamente significativa de recursos computacionais ao utilizar o modelo proposto.
+
+Esse trabalho está organizado como segue. A seção 2 apresenta o referencial teórico do trabalho. A seção 3 traz a proposta do mecanismo de reconfiguração dinâmica da arquitetura de controle. A seção 4 apresenta os métodos e materiais ampregados na proposta e validação. A seção 5 apresenta os resultados.  A seção 6 traz os trabalhos relacionados. Por fim, a seção 7 apresenta as conclusões e sugestões de trabalhos futuros.
+
 \section{O Mecanismo de Planejamento Reginal Adaptativo}
 
 Este trabalho tem como objetivo o projeto, implementação e avaliação de um modelo adaptativo para auto gerenciamento em sistemas \textit{self-adaptive} de larga escala. Esse modelo prevê a reconfiguração dinâmica da topologia do sistema gerenciador e da forma de comunicação entre os múltiplos componentes locais do controle. Através dessa abordagem, decisões de projeto acerca da topologia de controle a ser adotada serão levadas para \textit{runtime}. Com isso, espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema gerenciado/ambiente sugerem a adoção de topologias mais centralizadas, até situações onde padrões completamente descentralizados apresentam melhor \textit{trade-off}.
@@ -62,9 +84,19 @@ Esse trabalho considera a possibilidade de projeto de controladores com caracter
 
 Conforme discutido na seção de fundamentação teórica, a adoção do padrão \textit{Reginal Planning} apresenta um \textit{trade-off} que envolve a qualidade da adaptação e a quantidade de dados trafegados (e localmente mantidos) nos nós responsáveis pelo planejamento. Esse \textit{trade-off} é comumente administrado pelo arquiteto de \textit{software} em tempo de projeto. Para tanto, os tamanhos das regiões são fixos e definidos de maneira \textit{off-line}, sobretudo considerando as situações de maior sobrecarga previstas para a operação do sistema.
 
-Por conta da limitação imposta pelo padrão \textit{Reginal Planning}, na medida que o tamanho das regiões é definido em tempo de projeto, os sistemas gerenciadores tendem a operar de forma não ótima. Isto é, para as situações de sobrecarga do sistema -- onde um máximo de controle se faz necessário -- os controles regionais atuam de maneira ótima. Por outro lado, em situações onde a utilização de regiões menores seriam suficientes para garantir a qualidade de operação do sistema, uma subutilização de recursos se dará.
+Por conta da limitação imposta pelo padrão \textit{Regional Planning}, na medida que o tamanho das regiões é definido em tempo de projeto, os sistemas gerenciadores tendem a operar de forma não ótima. Isto é, para as situações de sobrecarga do sistema -- onde um máximo de controle se faz necessário -- os controles regionais atuam de maneira ótima. Por outro lado, em situações onde a utilização de regiões menores seriam suficientes para garantir a qualidade de operação do sistema, uma subutilização de recursos se dará.
 
 A possibilidade de se utilizar um modelo onde a decisão acerca do tamanho das regiões não mais seja uma definição a ser administrada em tempo de projeto, mas sim uma decisão levada para runtime, é o que motiva a adoção do Controle Regional Adaptativo proposto. Ao utilizar um tamanho variável de região o sistema gerenciador terá a possibilidade de operar de maneira ótima, independente dos diferentes estados apresentados pelo ambiente e sistema gerenciado ao longo do tempo.
+
+\subsection{O Mecanismo Proposto}
+
+O Mecanismo de Planejamento Regional Adaptativo proposto implementa uma variação do padrão \textit{Regional Planning}. Diferentemente do padrão \textit{Regional Planning}, o Planejamento Regional Adaptativo proposto transfere para tempo de execução a decisão acerca do tamanho das regiões. Dessa forma o sistema gerenciador passa a ser, ele mesmo, um sistema autoadaptativo.
+
+Para tanto, um segundo nível de controle é inserido na arquitetura (meta-controle). Os tamanhos de região que antes eram fixos -- definidos \textit{off-line} de maneira a suportar os cenários de pior caso -- passam a ser agora mantidos em tempo de execução pelo meta-controle. Com isso, espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema gerenciado/ambiente sugerem a adoção de regiões maiores (planejamento global), até situações onde pequenas regiões (planejamento local) mostram-se suficientes.
+
+Inserir figura...
+
+A figuraXXXX ilustra a possibilidade de reconfiguração do controle ao longo do tempo. Em momentos onde o sistema gerenciado e o ambiente demandem menos da adaptação, o tamanho das regiões será diminuído pelo meta-controle. Dessa forma recursos serão poupados. Por outro lado, nos momentos onde o meta-controle verificar que o componente MAPE responsável pelo planejamento regional necessita de monitoramento e análises mais globais de forma a garantir os requisitos de qualidade acordados, o tamanho das regiões será aumentado.
 
 \section{First Page} \label{sec:firstpage}
 
@@ -112,10 +144,10 @@ be Helvetica, 10 point, boldface, with 6 points of space before and after each
 caption.
 
 \begin{figure}[ht]
-\centering
-\includegraphics[width=.5\textwidth]{fig1.jpg}
-\caption{A typical figure}
-\label{fig:exampleFig1}
+	\centering
+	\includegraphics[width=.5\textwidth]{fig1.jpg}
+	\caption{A typical figure}
+	\label{fig:exampleFig1}
 \end{figure}
 
 \begin{figure}[ht]
