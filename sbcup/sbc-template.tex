@@ -161,7 +161,17 @@ Apesar de o modelo não depender diretamente da lei de controle, para que a simul
 
 \subsection{Implementação}
 
+A simulação foi implementada utilizando a linguagem de programação \textit{Python}. O \textit{Framwork SimPy} foi utillizado como principal arcabouço para implementação do simulador. Pacotes adicionais foram utilizados para geração dos números aleatórios de acordo com as distribuições definidas pelo modelo.
 
+A análise dos resultados foi implementada utilizando a tecnologia \textit{R}. \textit{Frameworks} para implementação dos testes de \textit{Anderson-Darling}, \textit{Levene}, \textit{T-Test} e \textit{Wilcoxon} foram utilizados para obtenção dos resultados finais.
+
+\subsection{Análise dos Resultados}
+
+Optou-se por realizar a análise dos dados realizando um estudo comparativo utilizando dois diferentes grupos controle. Um primeiro grupo utiliza a implementação do padrão de projeto \textit{Regional Planning}. Um segundo grupo foi elaborado utilizando o Planejamento Regional Adaptativo proposto nesse trabalho.
+
+O experimento apresenta um único fator: o meta-controle -- que implica variação no tamanho das regiões em tempo de execução. Esse único fator apresenta dois diferentes níveis: habilitado ou desabilitado. Para o nível desabilitado teremos o primeiro grupo controle, aquele que encapsula os resultados do modelo considerando a utilização do padrão \textit{Regional Planning}. Para o nível habilitado teremos o segundo grupo controle, este encapsula os resultados do modelo considerando a utilização do Planejamento Regional Adaptativo proposto nesse trabalho.
+
+Para cada nível foram implementadas cinquenta replicações utilizando as mesmas sementes. A quantidade de ciclos ociosos (\textit{idle}) foram medidos para cada uma das replicações. Os resultados das cinquenta replicações foram então analisados. Testes de \textit{Anderson-Darling} e \textit{Levene} foram aplicados a fim de analisar a normalidade e homocedasticidade dos resultados. Por fim, resultados finais foram obtidos após a aplicação de \textit{T-Test} e \textit{Wilcoxon}.
 
 \section{First Page} \label{sec:firstpage}
 
