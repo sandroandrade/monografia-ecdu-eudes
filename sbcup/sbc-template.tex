@@ -116,7 +116,7 @@ A figura que segue ilustra uma instância do padrão \textit{Regional Planning}.\\
 Na figura verifica-se a existência de dois diferentes tipos de nós de controle. O primeiro tipo de nó apresenta apenas o componente MAPE P. Em cada região existirá apenas um nó do tipo P. O segundo tipo de nó de controle apresenta os outros três componentes MAPE restantes: MAE. Em cada região existirão múltiplos nós de controle do tipo MAE. Em cada região os múltiplos componentes do tipo M  realizarão a monitoração do seu sistema local e do seu ambiente de execução. O componente A realizará uma análise local dos dados monitorados e os reportará para o planejador reginal P. O planejador regional P irã então planejar a adaptação local da região após cooperar com os planejadores P das outras regiões. Dessa forma a adaptação, em alguma medida, buscará ótimos globais, extrapolando os limites da monitoração e análise locais. Uma vez que os diversos planejadores regionais P concordem com um plano de adaptação os componentes E estarão prontos para ser executados localmente.\\
 Como consequência da adoção do padrão \textit{Regional Planning} verifica-se uma redução na quantidade de dados trafegados uma vez que a monitoração e análise são realizadas localmente -- a análise local dos dados monitorados reduz a quantidade de dados e a frequência com que interações serão realizadas com o nó central da região. Por outro lado, a adoção do padrão \textit{Regional Planning} pode apresentar como \textit{overhead} a necessidade de agregar localmente no nó de planejamento os resultados das diversas operações de análise. Outra desvantagem é a necessidade de uma fase de planejamento demasiada detalhada, uma vez que as fases de execução não coordenam.
 
-\section{O Mecanismo de Planejamento Reginal Adaptativo}
+\section{O Mecanismo de Planejamento Regional Adaptativo}
 
 Este trabalho tem como objetivo o projeto, implementação e avaliação de um modelo adaptativo para auto gerenciamento em sistemas \textit{self-adaptive} de larga escala. Esse modelo prevê a reconfiguração dinâmica da topologia do sistema gerenciador e da forma de comunicação entre os múltiplos componentes locais do controle. Através dessa abordagem, decisões de projeto acerca da topologia de controle a ser adotada serão levadas para \textit{runtime}. Com isso, espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema gerenciado/ambiente sugerem a adoção de topologias mais centralizadas, até situações onde padrões completamente descentralizados apresentam melhor \textit{trade-off}.
 
@@ -124,7 +124,7 @@ Esse trabalho considera a possibilidade de projeto de controladores com caracter
 
 \subsection{Motivação}
 
-Conforme discutido na seção de fundamentação teórica, a adoção do padrão \textit{Reginal Planning} apresenta um \textit{trade-off} que envolve a qualidade da adaptação e a quantidade de dados trafegados (e localmente mantidos) nos nós responsáveis pelo planejamento. Esse \textit{trade-off} é comumente administrado pelo arquiteto de \textit{software} em tempo de projeto. Para tanto, os tamanhos das regiões são fixos e definidos de maneira \textit{off-line}, sobretudo considerando as situações de maior sobrecarga previstas para a operação do sistema.
+Conforme discutido na seção de fundamentação teórica, a adoção do padrão \textit{Regional Planning} apresenta um \textit{trade-off} que envolve a qualidade da adaptação e a quantidade de dados trafegados (e localmente mantidos) nos nós responsáveis pelo planejamento. Esse \textit{trade-off} é comumente administrado pelo arquiteto de \textit{software} em tempo de projeto. Para tanto, os tamanhos das regiões são fixos e definidos de maneira \textit{off-line}, sobretudo considerando as situações de maior sobrecarga previstas para a operação do sistema.
 
 Por conta da limitação imposta pelo padrão \textit{Regional Planning}, na medida que o tamanho das regiões é definido em tempo de projeto, os sistemas gerenciadores tendem a operar de forma não ótima. Isto é, para as situações de sobrecarga do sistema -- onde um máximo de controle se faz necessário -- os controles regionais atuam de maneira ótima. Por outro lado, em situações onde a utilização de regiões menores seriam suficientes para garantir a qualidade de operação do sistema, uma subutilização de recursos se dará.
 
@@ -156,7 +156,7 @@ O grafo E (\textit{environment}) implementa detalhes referentes ao ambiente de e
 Conforme discutido nos parágrafos anteriores, os vértices do grafo E (\textit{environment}) implementam os nós do sistema distribuído simulado. Os nós (N) tem como principal atribuição a execução das operações do sistema gerenciado. Uma vez que os nós N tem o seu tempo de serviço afetado diretamente pela qualidade da adaptação, temos que o tempo de serviço das operações (TS) é função do tamanho das regiões (R): TS(R). Além do tamanho das regiões, verifica-se que o tempo de serviço das operações é diretamente influenciado pela perturbação (P) presente no ambiente. Sendo assim, tem-se que o tempo de serviço das operações é função tanto do tamanho das regiões quanto da perturbação existente no ambiente TS(R, P). A perturbação (P) mencionada anteriormente foi modelada através de uma variável aleatória. A sua intensidade foi obtida utilizando distribuição normal, ao passo que sua frequência de ocorrência é denotada por uma distribuição exponencial. Além das relações definidas na função TS(R, P), uma variável aleatória K foi inserida no cálculo do tempo de serviço das operações -- componente aleatório que representa perturbações internas ao nó. Os valores de K são obtidos de acordo com a distribuição \textit{Erlang} [livro simulação].\\
 Um último elemento que é tratado no componente E é a fila de operações a ser executada. O modelo proposto considera a existência de uma fila de operações que é constantemente alimentada e representa \textit{jobs} demandados por usuários. Os nós presentes no sistema atuam consumindo as operações que aguardam por processamento: TS(R, P). O tempo de chegada de novas operações na fila foi modelado através de uma variável aleatória com distribuição exponencial [livro simulação].
 
-Dois níveis de adaptação são observáveis no modelo proposto. O primeiro nível implementa o padrão \textit{Reginal Planning} e é responsável por garantir a adaptação nos nós responsáveis pela execução das operações. Esse controle é implementado na função que calcula o tempo de serviço das operações TS(R, P). O tamanho das regiões (R) é a variável que representa a contribuição do controle de primeiro nível no tempo de serviço das operações. Por outro lado, o modelo proposto considera a existência de uma adaptação de segundo nível, realizada através de um meta-controle (MC). Esse meta-controle é responsável por adaptar os controladores de primeiro nível, sobretudo atuando no tamanho das suas regiões. Para tanto, o meta-controle utiliza como variável controlada o número de ciclos \textit{idle} realizados pelos nós do sistema. O MC atua no tamanho das regiões: se a quantidade de ciclos \textit{idle} realizados é grande, o tamanho das regiões é reduzido -- o que implica uma direta economia de recursos. Por outro lado, caso a quantidade de ciclos \textit{idle} mantenha-se abaixo do ponto de controle, o controlador atuará de maneira a aumentar o tamanho das regiões -- \textit{overhead} será inserido, mas a qualidade do serviço será restaurada.\\
+Dois níveis de adaptação são observáveis no modelo proposto. O primeiro nível implementa o padrão \textit{Regional Planning} e é responsável por garantir a adaptação nos nós responsáveis pela execução das operações. Esse controle é implementado na função que calcula o tempo de serviço das operações TS(R, P). O tamanho das regiões (R) é a variável que representa a contribuição do controle de primeiro nível no tempo de serviço das operações. Por outro lado, o modelo proposto considera a existência de uma adaptação de segundo nível, realizada através de um meta-controle (MC). Esse meta-controle é responsável por adaptar os controladores de primeiro nível, sobretudo atuando no tamanho das suas regiões. Para tanto, o meta-controle utiliza como variável controlada o número de ciclos \textit{idle} realizados pelos nós do sistema. O MC atua no tamanho das regiões: se a quantidade de ciclos \textit{idle} realizados é grande, o tamanho das regiões é reduzido -- o que implica uma direta economia de recursos. Por outro lado, caso a quantidade de ciclos \textit{idle} mantenha-se abaixo do ponto de controle, o controlador atuará de maneira a aumentar o tamanho das regiões -- \textit{overhead} será inserido, mas a qualidade do serviço será restaurada.\\
 Apesar de o modelo não depender diretamente da lei de controle, para que a simulação pudesse ser executada fez-se necessário optar por uma implementação concreta. Nessa simulação optou-se por utilizar controladores PID para realização da adaptação.
 
 \subsection{Implementação}
@@ -172,6 +172,50 @@ Optou-se por realizar a análise dos dados realizando um estudo comparativo utili
 O experimento apresenta um único fator: o meta-controle -- que implica variação no tamanho das regiões em tempo de execução. Esse único fator apresenta dois diferentes níveis: habilitado ou desabilitado. Para o nível desabilitado teremos o primeiro grupo controle, aquele que encapsula os resultados do modelo considerando a utilização do padrão \textit{Regional Planning}. Para o nível habilitado teremos o segundo grupo controle, este encapsula os resultados do modelo considerando a utilização do Planejamento Regional Adaptativo proposto nesse trabalho.
 
 Para cada nível foram implementadas cinquenta replicações utilizando as mesmas sementes. A quantidade de ciclos ociosos (\textit{idle}) foram medidos para cada uma das replicações. Os resultados das cinquenta replicações foram então analisados. Testes de \textit{Anderson-Darling} e \textit{Levene} foram aplicados a fim de analisar a normalidade e homocedasticidade dos resultados. Por fim, resultados finais foram obtidos após a aplicação de \textit{T-Test} e \textit{Wilcoxon}.
+
+\section{Resultados}
+
+
+Para realização dos testes considerando o nível \textit{desabilitado} para o fator \textit{meta-controle} fez-se necessário definir um tamanho fixo para as regiões. O tamanho fixo adotado foi definido de forma que o controle tivesse condições de adaptar o sistema satisfatoriamente na situação de pior caso. Uma vez que o tempo de serviço TS é função do tamanho da região e do nível de perturbação verificado no ambiente em dado instante, calculou-se o tamanho mínimo de região necessário para suportar o ambiente nos momentos de maior perturbação possível. Tem-se que a perturbação gerada no ambiente é uma variável aleatória com distribuição normal, logo considerou-se como perturbação máxima o seu valor médio somado ao \textbf{erro máximo}.
+
+Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema:
+
+\begin{table}[!htbp]
+	\centering
+	\caption{Resultados do \textit{Regional Planning}}
+	\label{resultados-regional-planning}	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\multicolumn{10}{|c|}{Replicações} \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+	\end{tabular}	
+\end{table}
+
+Uma segunda execução da simulação foi realizada considerando o nível \textit{habilitado} para o fator \textit{meta-controle}. Tendo em vista que o nível \textit{habilitado} considera a utilização do Planejamento Regional Adaptativo proposto, o tamanho das regiões não mais foi mantido fixo. Uma configuração inicial da simulação inicia o tamanho da região com o mesmo utilizado no nível \textit{desabilitado}, porém, no decorrer da simulação, o tamanho da região é administrado pelo meta-controle.
+
+Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema:
+
+\begin{table}[!htbp]
+	\centering
+	\caption{Resultados do Planejamento Regional Adaptativo}
+	\label{resultados-planejamento-regional-adaptativo}	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		\multicolumn{10}{|c|}{Replicações} \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
+	\end{tabular}	
+\end{table}
+
+
+
 
 \section{First Page} \label{sec:firstpage}
 
