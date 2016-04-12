@@ -180,10 +180,10 @@ Para realização dos testes considerando o nível \textit{desabilitado} para o fat
 
 Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema:
 
-\begin{table}[!htbp]
+\begin{table}[ht]
 	\centering
 	\caption{Resultados do \textit{Regional Planning}}
-	\label{resultados-regional-planning}	
+	\label{tab:resultados-regional-planning}	
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
 		\hline
 		\multicolumn{10}{|c|}{Replicações} \\ \hline
@@ -199,10 +199,10 @@ Uma segunda execução da simulação foi realizada considerando o nível \textit{hab
 
 Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema:
 
-\begin{table}[!htbp]
+\begin{table}[ht]
 	\centering
 	\caption{Resultados do Planejamento Regional Adaptativo}
-	\label{resultados-planejamento-regional-adaptativo}	
+	\label{tab:resultados-planejamento-regional-adaptativo}	
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
 		\hline
 		\multicolumn{10}{|c|}{Replicações} \\ \hline
@@ -214,8 +214,9 @@ Após a execução da simulação considerando as cinquenta replicações chegou-se na 
 	\end{tabular}	
 \end{table}
 
+Uma investigação acerca da normalidade e homocedasticidade dos dados foi realizada a fim de se analisar a significancia dos resultados utilizando o \textit{t-test}. O resultado da análise de normalidade apresentou um p-value igual a 0.85. A análise de homocedasticidade apresentou um p-value igual a 0.05. Dos resultados anteriores conclui-se que ambos os testes falharam.
 
-
+Considerando-se as características de normalidade e homocedasticidade dos dados, concluiu-se que o \textit{t-test} não poderia ser utilizado como ferramenta para avaliação da significância dos resultados. Optou-se então pela realização do teste de \textit{Wilcoxon}. O resultado do teste de \textit{Wilcoxon} para as amostras anteriores apresentou um p-value de 0.85. O resultado apresentado garante que as amostras avaliadas apresentam melhora significativa dos resultados com 99\% de certeza.
 
 \section{First Page} \label{sec:firstpage}
 
