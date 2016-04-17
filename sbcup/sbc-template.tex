@@ -214,9 +214,27 @@ Após a execução da simulação considerando as cinquenta replicações chegou-se na 
 	\end{tabular}	
 \end{table}
 
-Uma investigação acerca da normalidade e homocedasticidade dos dados foi realizada a fim de se analisar a significancia dos resultados utilizando o \textit{t-test}. O resultado da análise de normalidade apresentou um p-value igual a 0.85. A análise de homocedasticidade apresentou um p-value igual a 0.05. Dos resultados anteriores conclui-se que ambos os testes falharam.
+Uma investigação acerca da normalidade e homocedasticidade dos dados foi realizada a fim de se analisar a significância dos resultados utilizando o \textit{t-test}. O resultado da análise de normalidade apresentou um p-value igual a 0.85. A análise de homocedasticidade apresentou um p-value igual a 0.05. Dos resultados anteriores conclui-se que ambos os testes falharam. A figura que segue apresenta a distribuição/densidade dos dados resultantes da simulação.
 
-Considerando-se as características de normalidade e homocedasticidade dos dados, concluiu-se que o \textit{t-test} não poderia ser utilizado como ferramenta para avaliação da significância dos resultados. Optou-se então pela realização do teste de \textit{Wilcoxon}. O resultado do teste de \textit{Wilcoxon} para as amostras anteriores apresentou um p-value de 0.85. O resultado apresentado garante que as amostras avaliadas apresentam melhora significativa dos resultados com 99\% de certeza.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=1.0\textwidth]{images/distribuicaoDensidade.jpg}
+	\caption{Distribuição }
+	\label{fig:exampleFig1}
+\end{figure}
+
+Considerando-se as características de normalidade e homocedasticidade dos dados, concluiu-se que o \textit{t-test} não poderia ser utilizado como ferramenta para avaliação da significância dos resultados.
+
+A imagem que segue apresenta uma análise comparativa dos resultados obtidos nos dois grupos.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/boxPlot.jpg}
+	\caption{Análise Comparativa Resultados Planejamento Regional Adaptativo}
+	\label{fig:exampleFig2}
+\end{figure}
+
+Optou-se então pela realização do teste de \textit{Wilcoxon}. O resultado do teste de \textit{Wilcoxon} para as amostras anteriores apresentou um p-value de 0.85. O resultado apresentado garante que as amostras avaliadas apresentam melhora significativa dos resultados com 99\% de certeza.
 
 \section{Trabalhos Relacionados}
 \label{sec:trabalhosRelacionados}
