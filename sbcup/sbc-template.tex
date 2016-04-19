@@ -176,43 +176,9 @@ Para cada nível foram implementadas cinquenta replicações utilizando as mesmas s
 \section{Resultados}
 \label{sec:resultados}
 
-Para realização dos testes considerando o nível \textit{desabilitado} para o fator \textit{meta-controle} fez-se necessário definir um tamanho fixo para as regiões. O tamanho fixo adotado foi o mínimo necessário de forma que o controle tivesse condições de adaptar o sistema satisfatoriamente na situação de pior caso. Uma vez que o tempo de serviço TS é função do tamanho da região e do nível de perturbação verificado no ambiente em dado instante, calculou-se o tamanho mínimo de região necessário para suportar o ambiente nos momentos de maior perturbação possível. Tem-se que a perturbação gerada no ambiente é uma variável aleatória com distribuição normal, logo considerou-se como perturbação máxima o seu valor médio somado ao \textbf{erro máximo}.
+Para realização dos testes considerando o nível \textit{desabilitado} para o fator \textit{meta-controle} fez-se necessário definir um tamanho fixo para as regiões. O tamanho fixo adotado foi o mínimo necessário de forma que o controle tivesse condições de adaptar o sistema satisfatoriamente na situação de pior caso. Uma vez que o tempo de serviço TS é função do tamanho da região e do nível de perturbação verificado no ambiente em dado instante, calculou-se o tamanho mínimo de região necessário para suportar o ambiente nos momentos de maior perturbação possível. Tem-se que a perturbação gerada no ambiente é uma variável aleatória com distribuição normal, logo considerou-se como perturbação máxima o seu valor médio somado ao \textbf{erro máximo}. Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema: 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432 e 543.
 
-Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema:
-
-\begin{table}[ht]
-	\centering
-	\caption{Resultados do \textit{Regional Planning}}
-	\label{tab:resultados-regional-planning}	
-	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-		\hline
-		\multicolumn{10}{|c|}{Replicações} \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-	\end{tabular}	
-\end{table}
-
-Uma segunda execução da simulação foi realizada considerando o nível \textit{habilitado} para o fator \textit{meta-controle}. Tendo em vista que o nível \textit{habilitado} considera a utilização do Planejamento Regional Adaptativo proposto, o tamanho das regiões não mais foi mantido fixo. Uma configuração inicial da simulação inicia o tamanho da região com o mesmo valor utilizado no nível \textit{desabilitado}, porém, no decorrer da simulação, o tamanho da região é administrado pelo meta-controle.
-
-Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema:
-
-\begin{table}[ht]
-	\centering
-	\caption{Resultados do Planejamento Regional Adaptativo}
-	\label{tab:resultados-planejamento-regional-adaptativo}	
-	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-		\hline
-		\multicolumn{10}{|c|}{Replicações} \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-		321 & 122 & 433 & 232 & 343 & 231 & 343 & 233 & 432 & 543 \\ \hline
-	\end{tabular}	
-\end{table}
+Uma segunda execução da simulação foi realizada considerando o nível \textit{habilitado} para o fator \textit{meta-controle}. Tendo em vista que o nível \textit{habilitado} considera a utilização do Planejamento Regional Adaptativo proposto, o tamanho das regiões não mais foi mantido fixo. Uma configuração inicial da simulação inicia o tamanho da região com o mesmo valor utilizado no nível \textit{desabilitado}, porém, no decorrer da simulação, o tamanho da região é administrado pelo meta-controle. Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema: 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432 e 543.
 
 Uma investigação acerca da normalidade e homocedasticidade dos dados foi realizada a fim de se analisar a significância dos resultados utilizando o \textit{t-test}. O resultado da análise de normalidade apresentou um p-value igual a 0.85. A análise de homocedasticidade apresentou um p-value igual a 0.05. Dos resultados anteriores conclui-se que ambos os testes falharam. A figura que segue apresenta a distribuição/densidade dos dados resultantes da simulação.
 
