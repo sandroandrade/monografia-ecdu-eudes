@@ -1,0 +1,212 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+
+\usepackage{graphicx,url}
+
+%\usepackage[brazil]{babel}   
+\usepackage[latin1]{inputenc}  
+
+     
+\sloppy
+
+\title{Planejamento Regional Adaptativo em Sistemas Self-Adaptive de Larga Escala}
+
+\author{Eudes S. Andrade, Sandro S. Andrade}
+
+\address{GSORT -- Grupo de Pesquisa em Sistemas Distribuídos, Otimização, Redes e Tempo Real\\
+	IFBA -- Instituto Federal de Educação, Ciência e Tecnologia da Bahia\\
+	Salvador-BA -- Brazil\\
+  \email{\{eudes.andrade,sandro.andrade\}@ifba.edu.br}
+}
+
+\begin{document} 
+
+\maketitle
+     
+\begin{resumo} 
+  Diversos padrões de projeto para implementação de sistemas distribuídos auto-adaptativos estão disponíveis na literatura. Alguns são mais efetivos em ambientes que sugerem a adoção de arquiteturas mais centralizadas. Outros apresentam melhores resultados operando de forma mais distribuída. Em ambiente incertos, no entanto, soluções pouco efetivas costumam ser adotadas. Este trabalho apresenta um modelo adaptativo para autogerenciamento de \textit{Sistemas Self-Adaptive}. Os resultados obtidos mostram que o modelo proposto apresenta desempenho satisfatório tanto em situações onde o sistema monitorado/ambiente sugerem a adoção de topologias mais centralizadas, até situações onde padrões completamente descentralizados apresentam melhor custo-benefício.
+\end{resumo}
+
+\section{Introdução}
+
+As diversas demandas envolvidas no desenvolvimento de sistemas computacionais modernos têm modificado a forma como tais aplicações são projetadas, desenvolvidas e avaliadas. Dentre tais demandas, destacam-se: a introdução de computadores multiprocessados, a abundância de paralelismo em soluções altamente distribuídas, a facilidade de integração e a capacidade de autogerenciamento em ambientes incertos \cite{DBLP:journals/ijhpca/Heroux09,DBLP:conf/icse/Northrop13,Gamell:2014:EAO:2683593.2683691}.
+
+Apesar de todas as estratégias disponibilizadas pela Engenharia de \textit{Software} para gerenciamento da complexidade gerada por esses novos desafios, acredita-se que a capacidade humana de compreensão e manipulação de artefatos de \textit{software} será um fator limitante em um futuro próximo \cite{DBLP:journals/csur/HuebscherM08}. A complexidade dos produtos de \textit{software} irá crescer continuamente até um ponto onde as tecnologias mais efetivas e os profissionais mais bem formados não serão capazes de construir soluções satisfatórias \cite{DBLP:journals/computer/KephartC03}.
+
+Tendo em vista que os maiores desafios expostos decorrem de requisitos não-funcionais -- e que estes têm sido historicamente tratados através de decisões de projeto -- linhas de pesquisa modernas apontam para uma nova abordagem: a transferência de determinadas decisões de projeto para \textit{runtime}. Para tanto, os sistemas computacionais precisam estar dotados de alguma capacidade de autogerencimento ou auto-adaptação \cite{DBLP:journals/csur/HuebscherM08,DBLP:journals/computer/KephartC03,DBLP:journals/taas/SalehieT09}.
+
+De acordo com a DARPA (\textit{Defense Advanced Research Projects Agency}) um sistema \textit{self-adaptive} é aquele que avalia o seu próprio comportamento e o modifica quando a avaliação indica que: i) o seu propósito principal não está sendo efetivamente cumprido; ou ii) uma melhor funcionalidade e/ou desempenho pode ser alcançado \cite{DARPA-selfadaptive}. A auto-adaptação é uma estratégia utilizada para os mais diversos fins, desde a otimização de performance em sistemas que operam sobre ambientes que mudam constantemente até situações mais extremas onde sistemas conseguem se recuperar após a falha de parte dos seus componentes \cite{DBLP:conf/dagstuhl/WeynsSGMMPWAGG10}. Apesar das diversas aplicações, temos como característica comum a todos os projetos que fazem uso de auto-adaptação a necessidade de migrar determinadas decisões -- que anteriormente eram tomadas em tempo de projeto -- para \textit{runtime}. A motivação para a tomada de decisão tardia é justificada uma vez que o arquiteto não mais precisará se comprometer de forma prematura com determinadas decisões de projeto. Decisões estas que, frequentemente, quando tomadas de forma prematura, podem não se mostrar interessantes em \textit{runtime}. Não se mostram interessantes sobretudo por conta da imprevisibilidade/dinamismo do ambiente de execução.
+
+A constatação de que soluções centralizadas -- anteriormente aplicadas com sucesso -- não são mais vistas como efetivas atualmente, trouxe algumas consequências. Assim como nos sistemas não-adaptativos, soluções de adaptação centralizadas passaram a não ser mais efetivas. Não eram mais efetivas por conta da imprevisibilidade imposta pelos ambientes distribuídos cada vez maiores e mais complexo. Não eram mais efetivas sobretudo por conta da crescente necessidade de controle em componentes específicos da solução distribuída para que ótimos globais pudessem ser alcançados. De acordo com [8], os sistemas auto-adaptativos que eram originalmente implementados utilizando uma estrutura de controle centralizada, deram espaço à projetos de controle potencialmente distribuídos.
+
+Muitas arquiteturas para autogerenciamento estão disponíveis atualmente na literatura. Ainda assim, a maioria delas apresenta como restrição o suporte, apenas, a sistemas centralizados. Algumas poucas arquiteturas implementam suporte a ambientes descentralizados e as poucas que o fazem não apresentam bom desempenho em ambientes altamente dinâmicos \cite{DBLP:conf/dagstuhl/WeynsSGMMPWAGG10}. A dificuldade para se alcançar autogerenciamento em ambientes descentralizados decorre do inerente \textit{trade-off} existente em sistemas distribuídos: qualidade da solução versus custo computacional. Ou seja, quanto maior o desempenho do sistema, menor a capacidade dele funcionar de maneira satisfatória em situações adversas (seja do ambiente ou da própria operação do sistema). Pode-se ilustrar esse \textit{trade-off} analisando \textit{clusters} para suporte a \textit{cloud computing}. Em tais situações, quanto maior o \textit{overhead} previsto menor será a capacidade do sistema se recuperar em caso de mudanças no ambiente. Por outro lado, quanto maior a folga observada no sistema maior será o consumo de recursos. O objetivo das arquiteturas para autogerenciamento descentralizado em tais \textit{clusters} é reagir ao \textit{trade-off} que envolve a capacidade de atendimento da \textit{cloud} frente às diversas configurações de ambiente apresentadas ao longo do tempo.
+
+A adoção de uma determinada topologia ao modelar o sistema responsável pela adaptação em detrimento de outra é função dos requisitos do sistema a ser monitorado e do ambiente ao qual este estará exposto. Em [8] seis padrões para modelagem de autogerenciamento descentralizado são propostos. Além dos modelos de comunicação a serem realizados entre os diversos componentes do controle, são apresentados os atributos de qualidade inseridos por cada padrão bem como as restrições impostas por tais decisões. Ainda assim, [8] não considera a possibilidade de adaptação dinâmica das topologias apresentadas. Dessa forma, apesar de os sistemas monitorados serem reconfigurados em \textit{runtime}, os sistemas responsáveis pela adaptação não tem nenhuma capacidade autoadaptativa.
+
+Este trabalho tem como objetivo o projeto e avaliação de um modelo adaptativo para autogerenciamento de \textit{Sistemas Self-Adaptive} (SSA) de larga escala. Esse modelo prevê a reconfiguração dinâmica da topologia e forma de comunicação entre os múltiplos componentes locais do controle. Através dessa abordagem, decisões de projeto acerca da topologia de controle a ser adotada serão levadas para \textit{runtime}. Com isso, espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema monitorado/ambiente sugerem a adoção de topologias mais centralizadas, até situações onde padrões completamente descentralizados apresentam melhor \textit{trade-off}.\\
+O mecanismo de reconfiguração dinâmica da arquitetura de controle proposta foi modelado e avaliado via simulação de eventos discretos. Resultados mostram que houve uma economia estatisticamente significante de recursos computacionais ao utilizar o modelo proposto.
+
+Esse trabalho está organizado como segue. A seção \ref{sec:fundamentacao} apresenta o referencial teórico. A seção \ref{sec:mecanismoProposto} traz o mecanismo de reconfiguração dinâmica da arquitetura de controle proposto. A seção \ref{sec:validacao} apresenta os métodos e materiais empregados na proposta e validação. A seção \ref{sec:resultados} apresenta os resultados.  A seção \ref{sec:trabalhosRelacionados} traz os trabalhos relacionados. Por fim, a seção \ref{sec:conclusao} apresenta as conclusões e sugestões de trabalhos futuros.
+
+\section{Sistemas \textit{Self-Adaptive} de Larga Escala}
+\label{sec:fundamentacao}
+
+Serão apresentadas nessa sessão definições acerca de duas matérias: Sistemas \textit{Self-Adaptive} e Padrões de Projeto para Sistemas \textit{Self-Adaptive}. Em um primeiro momento será discutida a motivação para a adoção de soluções auto-adaptivas e seus fundamentos básicos. Na sessão seguinte serão apresentados conceitos acerca de seis padrões de projeto para controle descentralizado em sistemas auto-adaptativos. Após o detalhamento dos atributos de qualidade inseridos por um dos padrões serão trazidas à luz as restrições impostas por tais decisões.
+
+\subsection{Sistemas Self-Adaptive}
+
+A auto-adaptação é uma estratégia de projeto utilizada para os mais diversos fins. Ainda assim, dentre as diversas características comuns a todos os projetos que lançam mão de auto-adaptação, uma se destaca: a necessidade de migrar determinadas decisões que anteriormente eram tomadas em tempo de projeto, para tempo de execução. Através desse artifício, busca-se minimizar possíveis inflexibilidades/ineficiências decorrentes de compromentimentos prévios do arquiteto de \textit{software} com determinados atributos de qualidade. A ocorrência de situações não previstas pelo arquiteto de \textit{sorftware} decorre, sobretudo, do dinamismo dos ambientes de execução das aplicações. Sendo assim, quanto menor a quantidade de premissas e compromentementos prévios realizados pelo arquiteto, maior será a capacidade de evolução e flexibilização das arquiteturas de \textit{software} frente aos diversos cenários de uso.
+
+Para ilustrar tal situação, podemos considerar um cenário onde uma solução não-adaptativa foi escolhida em detrimento de um algoritmo adaptativo. O arquiteto pode, por exemplo, ser obrigado a fazer opção, em tempo de projeto, por uma determinada solução para \textit{caching} em detrimento de outras. Apesar de essa decisão do arquiteto parecer inicialmente acertada, ela pode implicar perda de eficiência caso os padrões de acesso e/ou a natureza dos dados mudem.\\
+Por outro lado, com a adoção de algoritmos adaptativos, o arquiteto de \textit{software} poderá não mais tomar determinadas decisões a priori, protelando-as para tempo de execução. No exemplo citado, as decisões acerca do melhor algoritmo de \textit{cache} a ser adotado será tomada em tempo de execução. Essas decisões irão então considerar as peculiaridades dinâmicas em dado instante, implicando melhor performance do sistema nos seus diferentes cenários de uso.\\
+Definir mecanismos onde o próprio sistema computacional monitore suas condições em dado instante e se reconfigure/replaneje resolve não apenas as incertezas introduzidas pelos ambientes dinâmicos. Em situações onde a realização de \textit{tuning} de sistemas computacionais envolve um alto e dependente número de parâmetros (o que eventualmente pode encontrar como limite as habilidades/capacidades humanas), soluções adaptativas mostram-se efetivas[referencia]. De uma maneira geral, sistemas autogerenciaveis apresentam como requisitos algumas das seguintes características: alta complexidade dos espaços de problema e solução; dinamismo nos dados, nas demandas por serviços e nos ambientes de execução; e características funcionais auto-adaptativas.
+
+Diversas definições de sistemas auto-adaptativos podem ser encontrados na literatura [18, 62, 145, 194, 267]. Uma das definições mais recorrentes é a proposta pela DARPA (\textit{Defense Advanced Research Projects Agency}), em 1997. "Um sistema \textit{self-adaptive} é aquele que avalia o seu próprio comportamento e o modifica quando a avaliação indica que: i) o seu propósito principal não está sendo efetivamente cumprido; ou ii) uma melhor funcionalidade e/ou desempenho pode ser alcançado."
+
+Verificar se o propósito principal de dado sistema está sendo efetivamente cumprido é a principal meta de um sistema auto-adaptativo. Para tanto, é importante que a meta do controle seja claramente definida. A literatura define três possíveis tipos de metas de controle. A primeira delas é o \textit{controle regulatório}. Adota-se esse tipo de meta quando deseja-se ter um mecanismo para variar o \textit{setpoint} e adaptar o sistema a novos cenários -- quando o \textit{setpoint} muda frequentemente, tem-se \textit{tracking control}. A \textit{rejeição de perturbações} é um segundo tipo de meta previsto na literatura. Esta é utilizada quando deseja-se que a qualidade do serviço entregue pelo sistema não seja degradado -- consideravelmente -- na ocorrência de perturbações, diferente daquela, que muda constantemente o \textit{setpoint}. Por fim têm-se o \textit{controle ótimo}, que é um tipo especial de meta de controle utilizada quando não tem-se um setpoint, apenas deseja-se manter esta variável em um valor máximo/mínimo.
+
+Nesse ponto, a distinção entre duas partes principais dos sistemas autogerenciados faz-se necessário. Um primeiro sistema, dito \textbf{gerenciado}, é o sistema responsável pela implementação da regra de negócio da aplicação. Esse sistema gerenciado sofrerá as ações da adaptação. Por outro lado, um segundo sistema é responsável por dotar o \textit{software} gerenciado de capacidades auto adaptativas. Esse segundo sistema, chamado de sistema \textbf{gerenciador}, é responsável por adicionar as capacidades de autogerenciamento ao sistema gerenciado -- Figura \ref{fig:exampleFig3}.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/sistemasGerenciadorGerenciado.png}
+	\caption{Sistemas Gerenciador e Gerenciado}
+	\label{fig:exampleFig3}
+\end{figure}
+
+Ainda que uma grande quantidade de mecanismos de autogerenciamento tenham sido propostos nos últimos anos, muitos deles fundamentam-se na utilização de \textit{loops} de adaptação. Sendo assim, pode-se dizer que um sistema gerenciador consiste fundamentalmente em uma implementação de \textit{loop} de adaptação. O nível de acoplamento experimentado entre os sistemas gerenciador e gerenciado é uma decisão de projeto. Uma primeira possiblidade consiste em implementar \textit{loops} de adaptação (sistema gerenciador) de forma externa ao sistema gerenciado. Uma outra abordagem consiste em implementar sistemas gerenciadores e gerenciado em uma única estrutura (sistema gerenciador faz parte do sistema gerenciado).\\
+Tendo em vista que os \textit{loops} de adaptação são uma solução recorrente para modelagem e implementação de sistemas gerenciadores, a seguir serão apresentadas as principais características dos loops de controle MAPE.
+
+Os loops de controle MAPE foram inicialmente apresentadados pela IBM no artigo intitulado \textit{An architectural blueprint for autonomic computing}. Diversas discussões acerca dos \textit{loops} MAPE foram realizadas ao longo do tempo no contexto dos sistemas auto adaptativos [111]. Tais \textit{loops} fundamentam-se na execução, em sequencia, das seguintes fases: \textbf{M}onitoramento, \textbf{A}nálise, \textbf{P}lanejamento e \textbf{E}xecução. A fase de monitoramento é responsável por obter informações acerta do estado do sistema. A atividade de análise consiste na avaliação das informações obtidas na fase de monitoramento. Após a avaliação de tais dados, a etapa de análise deverá deliberar pela necessidade ou não de realização de adaptação. A fase de planejamento é responsável pela definição de quais atividades de adaptação serão realizadas para que o sistema retorne a um estado que interesse à análise. Por fim, a atividade de execução consiste em realizar de forma efetiva as tarefas definidas pela fase de planejamento.\\
+Uma série de variações dessa estrutura inicial de \textit{loops} de adaptação são encontradas na literatura, a exemplo do MAPE-K (apresenta as mesmas fases dos \textit{loops} MAPE, adicionando uma base de conhecimento K).
+
+\subsection{Padrões para Controle Descentralizado em Sistemas auto-adaptativos}
+
+Quando os sistemas são heterogêneos, grandes e complexos, um único \textit{loop} de controle pode não ser suficiente para gerenciar toda a adaptação [OnPatterns, ref 9,1]. Nesses casos, múltiplos \textit{loops} de controle podem ser empregados para gerenciar diferentes partes do sistema. Essa distribuição dos \textit{loops} de controle nos diversos nós de da sistema distribuído traz uma complexidade a mais para o \textit{design }da solução: a coordenação na execução dos diversos \textit{loops}. Dessa problemática surge uma importante decisão a ser tomada em tempo de projeto: como se dará a cooperação entre os diversos \textit{loops} de controle. Nesse momento algumas questões emergem, a exemplo das duas que seguem. Todas as fases dos controles MAPE (monitoração, análise, planejamento e execução) irão cooperar entre sí em todo o sistema? Cada sistema gerenciador realizará isoladamente a fase de monitoração (sem cooperação) e as demais fases serão realizadas em um único \textit{loop} de controle? A resposta para essas questões foi discutida no artigo \textit{On Patterns for decentralized Control in Self Adaptive Systems} [referenciaBLA].
+
+De acordo com [referenciaBLA] diferentes padrões para implementação de \textit{loops} de controle tem sido utilizados de maneira prática na indústria. O \textit{Framework Rainbow}, por exemplo, distribui as fases de monitoração e execução sobre os diversos nós do sistema ao passo que mantem as fases de análise e planejamento centralizadas [referencia 17 do onPattern]. Por outro lado, os \textit{blue prints} arquiteturais da IBM [referencia 25 do onPattern] organizam os \textit{loops} MAPE hierarquicamente, mantendo em cada nível da hierarquia todas as quatro fases do \textit{loop} MAPE.\\
+Em [referencia para onPattern] um conjunto de seis padrões para implementação de controle descentralizado é apresentado. Para cada padrão são apresentados os atributos de qualidade decorrentes da sua adoção, bem como as restrições impostas por tais decisões. Dentre os seis padrões apresentados em [referencia para onPattern] encontra-se o \textit{Regional Planning}. O padrão \textit{Regional Planning} aplica-se fundamentalmente em situações onde diversas partes integradas (regiões) de um sistema demandam não apenas por adaptações locais (dentro das regiões) mas também por adaptações globais (que extrapolam os limites das regiões). A solução proposta pelo \textit{Regional Planning} provê um único componente P (\textit{planning}) para cada região. Esse planejador regional é responsável por coletar as informações de todos os componentes que fazem parte da sua região para que o planejamento seja realizado. Planejadores regionais coordenam entre si (sobre múltiplas regiões) para realização do planejamento da adaptação global, ao passo que todos os outros componentes MAPE operam isoladamente. A Figura \ref{fig:exampleFig10} ilustra uma instância do padrão \textit{Regional Planning}.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/figuraPlanejamentoRegional.png}
+	\caption{Instância do Padrão \textit{Regional Planning}}
+	\label{fig:exampleFig10}
+\end{figure}
+
+Na figura verifica-se a existência de dois diferentes tipos de nós de controle. O primeiro tipo de nó apresenta apenas o componente MAPE P. Em cada região existirá apenas um nó do tipo P. O segundo tipo apresenta os outros três componentes MAPE restantes: MAE. Em cada região existirão múltiplos nós de controle do tipo MAE. Em cada região os múltiplos componentes do tipo M  realizarão a monitoração do seu sistema local e do seu ambiente de execução. O componente A realizará uma análise local dos dados monitorados e os reportará para o planejador reginal P. O planejador regional P irá então planejar a adaptação local da região após cooperar com os planejadores P das outras regiões. Dessa forma a adaptação, em alguma medida, buscará ótimos globais, extrapolando os limites da monitoração e análise locais. Uma vez que os diversos planejadores regionais P concordem com um plano de adaptação os componentes E estarão prontos para ser executados localmente.\\
+Como consequência da adoção do padrão \textit{Regional Planning} verifica-se uma redução na quantidade de dados trafegados uma vez que a monitoração e análise são realizadas localmente -- a análise local dos dados monitorados reduz a quantidade de dados e a frequência com que interações serão realizadas com o nó central da região. Por outro lado, a adoção do padrão \textit{Regional Planning} pode apresentar como \textit{overhead} a necessidade de agregar localmente no nó de planejamento os resultados das diversas operações de análise. Outra desvantagem é a necessidade de uma fase de planejamento demasiada detalhada, uma vez que as fases de execução não coordenam.\\
+Como última característica relevante acerca do padrão \textit{Regional Planning} verifica-se a  definição em tempo de projeto do tamanho das regiões. A consequência direta de tal característica é a impossibilidade de, em tempo de execução, realizar uma reconfiguração dinâmica dos limites das regiões.
+
+\section{O Mecanismo de Planejamento Regional Adaptativo}
+\label{sec:mecanismoProposto}
+
+Este trabalho tem como objetivo o projeto, implementação e avaliação de um modelo adaptativo para auto gerenciamento em sistemas \textit{self-adaptive} de larga escala. Esse modelo prevê a reconfiguração dinâmica da topologia do sistema gerenciador e da forma de comunicação entre os múltiplos componentes locais do controle. Através dessa abordagem, decisões de projeto acerca da topologia de controle a ser adotada serão levadas para \textit{runtime}. Com isso, espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema gerenciado/ambiente sugerem a adoção de topologias mais centralizadas, até situações onde padrões completamente descentralizados apresentam melhor \textit{trade-off}.
+
+Esse trabalho considera a possibilidade de projeto de controladores com características tais onde, eles mesmos, sejam vistos como sistemas auto adaptativos. Dessa forma, as decisões acerca dos limites das regiões em arquiteturas baseadas no padrão \textit{Regional Planning} não mais serão tomadas de maneira \textit{off-line}. Através do modelo proposto, a depender do seu estado interno e das condições do ambiente, a arquitetura do sistema gerenciador será reconfigurada (desde abordagens mais centralizadas até os extremos providos pelos padrões mais distribuídos).
+
+\subsection{Motivação}
+
+Conforme discutido na seção de fundamentação teórica, a adoção do padrão \textit{Regional Planning} apresenta um \textit{trade-off} que envolve a qualidade da adaptação e a quantidade de dados trafegados (e localmente mantidos) nos nós responsáveis pelo planejamento. Esse \textit{trade-off} é comumente administrado pelo arquiteto de \textit{software} em tempo de projeto. Para tanto, os tamanhos das regiões são fixos e definidos de maneira \textit{off-line}, sobretudo considerando as situações de maior sobrecarga previstas para a operação do sistema.
+
+Por conta da limitação imposta pelo padrão \textit{Regional Planning} na medida que o tamanho das regiões é definido em tempo de projeto, os sistemas gerenciadores tendem a operar de forma não ótima. Isto é, para as situações de sobrecarga do sistema -- onde um máximo de controle se faz necessário -- os controles regionais atuam de maneira satisfatória. Por outro lado, em situações onde a utilização de regiões menores seriam suficientes para garantir a qualidade de operação do sistema, uma subutilização de recursos se dará.
+
+A possibilidade de se utilizar um modelo onde a decisão acerca do tamanho das regiões não mais seja uma definição a ser administrada em tempo de projeto, mas sim uma decisão levada para runtime, é o que motiva a adoção do Controle Regional Adaptativo proposto. Ao utilizar um tamanho variável de região o sistema gerenciador terá a possibilidade de operar de maneira ótima independente dos diferentes estados apresentados pelo ambiente e sistema gerenciado ao longo do tempo.
+
+\subsection{O Mecanismo Proposto}
+
+O Mecanismo de Planejamento Regional Adaptativo proposto implementa uma variação do padrão \textit{Regional Planning}. Diferentemente do padrão \textit{Regional Planning}, o Planejamento Regional Adaptativo proposto transfere para tempo de execução a decisão acerca do tamanho das regiões. Dessa forma o sistema gerenciador passa a ser, ele mesmo, um sistema autoadaptativo com meta de rejeição de perturbação.
+
+Para tanto, um segundo nível de controle é inserido na arquitetura (meta-controle). Os tamanhos de região que antes eram fixos -- definidos \textit{off-line} de maneira a suportar os cenários de pior caso -- passam a ser agora mantidos em tempo de execução pelo meta-controle. Com isso, espera-se obter desempenho satisfatório do controle tanto em situações onde o sistema gerenciado/ambiente sugerem a adoção de regiões maiores (planejamento global), até situações onde pequenas regiões (planejamento local) mostram-se suficientes. Trata-se portanto de adicionar ao padrão \textit{Regional Planning} um segundo nível de adaptação com meta de rejeição de perturbação.
+
+Inserir figura...
+
+A figuraXXXX ilustra a possibilidade de reconfiguração do controle ao longo do tempo. Em momentos onde o sistema gerenciado e o ambiente demandem menos da adaptação, o tamanho das regiões será diminuído pelo meta-controle. Dessa forma recursos serão poupados. Por outro lado, nos momentos onde o meta-controle verificar que o componente MAPE responsável pelo planejamento regional necessita de monitoramento e análises mais globais de forma a garantir os requisitos de qualidade acordados, o tamanho das regiões será aumentado.
+
+A fundamentação para tal investigação fundamenta-se sobretudo nos impactos decorrentes da variação do tamanho das regiões. A hipótese aqui elaborada considera que a adoção de grandes regiões traz como ponto positivo a maior presença de informações globais, o que implica a possibilidade de o controle realizar adaptações mais efetivas. Por outro lado, o aumento no tamanho das regiões acarreta em, além de maior custo computacional, menor disponibilidade e escalabilidade. Sendo assim, o objetivo geral da solução proposta é regular, automaticamente, o \textit{trade-off} existente entre a efetividade das adaptações versus a disponibilidade e escalabilidade da solução.
+
+Algumas premissas foram consideradas nessa proposta -- algumas delas são apresentadas na seção de sugestão de trabalhos futuros. A primeira delas é que o \textit{overhead} inserido pelo meta-controle em grandes regiões é desprezível. Uma segunda premissa é de que todas as regiões possuem o mesmo tamanho. Por fim, considerou-se que o cluster possui jobs sendo demandados a todo momento. Apesar de algumas dessas premissas implicar importantes simplificações ao modelo proposto, optou-se por mantê-las de forma a viabilizar uma primeira validação do modelo proposto.
+
+Apresentados os principais elementos que definem o Planejamento Regional Adaptativo proposto, temos a definição da hipótese avaliada. Deseja-se investigar, estatisticamente, se:
+
+"Hipótese alternativa (H1): Mantida a qualidade do serviço, a quantidade de ciclos \textit{idle} (o tamanho das regiões) utilizando o modelo proposto é menor do que a média utilizando o padrão \textit{Regional Planning}."
+
+\section{Validação}
+\label{sec:validacao}
+
+O mecanismo de reconfiguração dinâmica da arquitetura de controle proposta foi modelado e avaliado via simulação de eventos discretos. Os resultados da simulação foram avaliados considerando dois grupos controle: um primeiro decorrente da execução da simulação utilizando o Planejamento Regional Adaptativo proposto nesse trabalho e um segundo utilizando a implementação do padrão de projeto \textit{Regional Planning} -- o que implica a adoção \textit{off-line} dos tamanhos de regiões utilizados.
+
+Dada a hipótese apresentada na seção que discute o Mecanismo de Planejamento Regional Adaptativo proposto tem-se como hipótese nula a ser refutada o que segue:
+
+"Hipótese nula (H0): A utilização do modelo proposto apresentou uma quantidade de ciclos maior do que utilizando o padrão \textit{Regional Planning}."
+
+A modelagem e implementação do simulador utilizado na validação será apresentado na seção que segue. A seção subsequente discutirá os testes realizados com os resultados provenientes dos dois grupos controle.
+
+\subsection{Simulação}
+
+Optou-se por, nesse primeiro trabalho, validar o Planejamento Regional Adaptativo proposto através de simulação de eventos discretos. Para tanto, uma modelagem dos componentes gerenciados, gerenciadores e do meta-controle fizeram-se necessárias. Após a modelagem da simulação uma implementação da mesma foi realizada. Dessa forma análises estatísticas acerca da efetividade da arquitetura proposta foram viabilizadas.
+
+O modelo da simulação define o sistema gerenciado, gerenciador e meta-controle como um grande sistema distribuído. Esse sistema distribuído foi modelado através de um grafo E(N;C). O grafo E (\textit{environment}) é composto por um conjunto finito de N > 1 de nós, denominado, N = {N1, N2,...,Nn}, e um conjunto finito de canais de comunicação C = f(Ni; Nj) | Ni,Nj E N. Vértices representam nós (sistemas gerenciados e gerenciadores) e as arestas representam canais de comunicação. Cada canal de comunicação é uma abstração de toda a infraestrutura de comunicação entre dois nós e modela a interação entre os processos associados por meio de troca de mensagens.
+
+O grafo E implementa os detalhes referentes ao ambiente de execução do sistema simulado. Nesse grafo é mantida a lista de componentes que simulam os diversos nós do sistema. Além dos nós, o componente \textit{environment} é responsável por manter informações acerca das regiões. É também no grafo E que são adicionadas as perturbações (P) ao ambiente.
+
+Conforme discutido nos parágrafos anteriores, os vértices do grafo E implementam os nós do sistema distribuído simulado. Os nós (N) tem como principal atribuição a execução das operações do sistema gerenciado. Uma vez que os nós N tem o seu tempo de serviço afetado diretamente pela qualidade da adaptação, temos que o tempo de serviço das operações (TS) é função do tamanho das regiões (R): TS(R). Além do tamanho das regiões, verifica-se que o tempo de serviço das operações é diretamente influenciado pela perturbação (P) presente no ambiente. Sendo assim, tem-se que o tempo de serviço das operações é função tanto do tamanho das regiões quanto da perturbação existente no ambiente TS(R, P). A perturbação (P) mencionada anteriormente foi modelada através de uma variável aleatória. A sua intensidade foi obtida utilizando distribuição normal, ao passo que sua frequência de ocorrência é denotada por uma distribuição exponencial. Além das relações definidas na função TS(R, P), uma variável aleatória K foi inserida no cálculo do tempo de serviço das operações -- componente aleatório que representa perturbações internas ao nó. Os valores de K são obtidos de acordo com a distribuição \textit{Erlang} [livro simulação].\\
+Um último elemento que é tratado no componente E é a fila de operações a ser executada. O modelo proposto considera a existência de uma fila de operações que é constantemente alimentada e representa \textit{jobs} demandados por usuários. Os nós presentes no sistema atuam consumindo as operações que aguardam por processamento: TS(R, P). O tempo de chegada de novas operações na fila foi modelado através de uma variável aleatória com distribuição exponencial [livro simulação].
+
+Dois níveis de adaptação são observáveis no modelo proposto. O primeiro nível implementa o padrão \textit{Regional Planning} e é responsável por garantir a adaptação nos nós responsáveis pela execução das operações. Esse controle é implementado na função que calcula o tempo de serviço das operações TS(R, P). O tamanho das regiões (R) é a variável que representa a contribuição do controle de primeiro nível no tempo de serviço das operações. Por outro lado, o modelo proposto considera a existência de uma adaptação de segundo nível, realizada através de um meta-controle (MC). Esse meta-controle é responsável por adaptar os controladores de primeiro nível, sobretudo atuando no tamanho das suas regiões. Para tanto, o meta-controle utiliza como variável controlada o número de ciclos \textit{idle} realizados pelos nós do sistema. O MC atua no tamanho das regiões da forma que segue: se a quantidade de ciclos \textit{idle} realizados é grande, o tamanho das regiões é reduzido -- o que implica uma direta economia de recursos. Por outro lado, caso a quantidade de ciclos \textit{idle} mantenha-se abaixo do ponto de controle, o MC atuará de maneira a aumentar o tamanho das regiões -- \textit{overhead} será inserido, mas a qualidade do serviço será restaurada.\\
+Apesar de o modelo não depender diretamente da lei de controle, para que a simulação pudesse ser executada fez-se necessário optar por uma implementação concreta. Nessa simulação optou-se por utilizar controladores PID para realização da adaptação.
+
+\subsection{Implementação}
+
+A simulação foi implementada utilizando a linguagem de programação \textit{Python}. O \textit{Framwork SimPy} foi utillizado como principal arcabouço para implementação do simulador. Pacotes adicionais foram utilizados para geração dos números aleatórios de acordo com as distribuições definidas pelo modelo.
+
+A análise dos resultados foi implementada utilizando a tecnologia \textit{R}. \textit{Frameworks} para implementação dos testes de \textit{Anderson-Darling}, \textit{Levene}, \textit{T-Test} e \textit{Wilcoxon} foram utilizados para obtenção dos resultados finais.
+
+\subsection{Análise dos Resultados}
+
+Optou-se por realizar a análise dos dados realizando um estudo comparativo utilizando dois diferentes grupos controle. Um primeiro grupo utiliza a implementação do padrão de projeto \textit{Regional Planning}. Um segundo grupo foi elaborado utilizando o Planejamento Regional Adaptativo proposto nesse trabalho.
+
+O experimento apresenta um único fator: o meta-controle -- que implica variação no tamanho das regiões em tempo de execução. Esse único fator apresenta dois diferentes níveis: habilitado ou desabilitado. Para o nível desabilitado teremos o primeiro grupo controle, aquele que encapsula os resultados do modelo considerando a utilização do padrão \textit{Regional Planning}. Para o nível habilitado teremos o segundo grupo controle, este encapsula os resultados do modelo considerando a utilização do Planejamento Regional Adaptativo proposto nesse trabalho.
+
+Para cada nível foram implementadas cinquenta replicações utilizando as mesmas sementes. A quantidade de ciclos ociosos (\textit{idle}) foi medida para cada uma das replicações. Os resultados das cinquenta replicações foram então analisados. Testes de \textit{Anderson-Darling} e \textit{Levene} foram aplicados a fim de analisar a normalidade e homocedasticidade dos resultados. Por fim, resultados finais foram obtidos após a aplicação de \textit{T-Test} e \textit{Wilcoxon}.
+
+\section{Resultados}
+\label{sec:resultados}
+
+Para realização dos testes considerando o nível \textit{desabilitado} para o fator \textit{meta-controle} fez-se necessário definir um tamanho fixo para as regiões. O tamanho fixo adotado foi o mínimo necessário de forma que o controle tivesse condições de adaptar o sistema satisfatoriamente na situação de pior caso. Uma vez que o tempo de serviço TS é função do tamanho da região e do nível de perturbação verificado no ambiente em dado instante, calculou-se o tamanho mínimo de região necessário para suportar o ambiente nos momentos de maior perturbação possível. Tem-se que a perturbação gerada no ambiente é uma variável aleatória com distribuição normal, logo considerou-se como perturbação máxima o seu valor médio somado ao \textbf{erro máximo}. Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema: 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432 e 543.
+
+Uma segunda execução da simulação foi realizada considerando o nível \textit{habilitado} para o fator \textit{meta-controle}. Tendo em vista que o nível \textit{habilitado} considera a utilização do Planejamento Regional Adaptativo proposto, o tamanho das regiões não mais foi mantido fixo. Uma configuração inicial da simulação inicia o tamanho da região com o mesmo valor utilizado no nível \textit{desabilitado}, porém, no decorrer da simulação, o tamanho da região é administrado pelo meta-controle. Após a execução da simulação considerando as cinquenta replicações chegou-se na seguinte quantidade de ciclos ociosos do sistema: 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432, 543, 321, 122, 433, 232, 343, 231, 343, 233, 432 e 543.
+
+Uma investigação acerca da normalidade e homocedasticidade dos dados foi realizada a fim de se analisar a significância dos resultados utilizando o \textit{t-test}. O resultado da análise de normalidade apresentou um p-value igual a 0.85. A análise de homocedasticidade apresentou um p-value igual a 0.05. Dos resultados anteriores conclui-se que ambos os testes falharam -- Figura \ref{fig:exampleFig1}.
+
+Considerando-se as características de normalidade e homocedasticidade dos dados, concluiu-se que o \textit{t-test} não poderia ser utilizado como ferramenta para avaliação da significância dos resultados. Optou-se então pela realização do teste de \textit{Wilcoxon}. O resultado do teste de \textit{Wilcoxon} para as amostras anteriores apresentou um p-value de 0.85. O resultado apresentado garante que as amostras avaliadas apresentam melhora significativa dos resultados com 99\% de certeza. Uma representação gráfica do estudo comparativo dos resultados pode ser verificado na Figura \ref{fig:exampleFig2}.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=1.0\textwidth]{images/distribuicaoDensidade.jpg}
+	\caption{Distribuição dos Dados Resultantes da Simulação }
+	\label{fig:exampleFig1}
+\end{figure}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/boxPlot.jpg}
+	\caption{Análise Comparativa Resultados Planejamento Regional Adaptativo}
+	\label{fig:exampleFig2}
+\end{figure}
+
+\section{Trabalhos Relacionados}
+\label{sec:trabalhosRelacionados}
+
+Tenho dificuldade para encontrar trabalhos relacionados. Vou ver dos artigos compartilhados no dropbox o que dá para tirar!
+
+\section{Conclusão e Trabalhos Futuros}
+\label{sec:conclusao}
+
+Esse trabalho apresentou o Planejamento Regional Adaptativo -- uma arquitetura alternativa ao padrão \textit{Regional Planning} cujos principais diferenciais residem na economia de recursos computacionais e menor necessidade de provisionamento de ambiente. Diferentemente do padrão \textit{Regional Planning}, o modelo proposto dotou o sistema gerenciador, assim como o sistema gerenciado, de capacidades auto-adaptativas. Utilizando essa abordagem, o Planejamento Regional Adaptativo proposto viabilizou a execução do sistema gerenciador utilizando tamanhos reduzidos de regiões, o que implicou uma direta economia de recursos computacionais.
+
+A hipótese verificada nesse trabalho foi: "". O mecanismo de reconfiguração dinâmica da arquitetura de controle proposto foi modelado e avaliado via simulação de eventos discretos. Dois grupos controle tiveram seus desempenhos comparados: controle utilizando o padrão \textit{Regional Planning} e controle utilizando o Planejamento Regional Adaptativo proposto. Uma análise dos resultados foi realizada e concluí-se com uma certeza de 99\% que houve um aumento no desempenho do sistema gerenciador ao utilizar o Planejamento Regional Adaptativo proposto.
+
+Como trabalho futuro verifica-se a possibilidade de extensão do modelo da simulação. Para tanto, outras variáveis eventualmente relevantes à análise dos resultados poderão ser adicionadas ao modelo. Um segundo trabalho futuro a ser realizado consiste em um estudo de caso de uma implementação real do modelo proposto. A análise comparativa dos resultados do estudo de caso sugerido frente a hipótese apresentada neste trabalho mostra-se como uma segunda possibilidade de validação do Planejamento Regional Adaptativo proposto. 
+
+\bibliographystyle{sbc}
+\bibliography{sbc-template}
+
+\end{document}
